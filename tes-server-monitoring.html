@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Server Monitoring with Last Version</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4f8;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        gap: 2px;
+        width: 98%;
+        height: 95%;
+      }
+
+      .server-box {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid #e0e0e0;
+        font-size: 12px;
+      }
+
+      .server-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+      }
+
+      .server-name {
+        font-weight: bold;
+        color: #333;
+        flex: 1;
+        text-align: left;
+      }
+
+      .be-version {
+        font-size: 9.5px;
+        color: #666;
+        flex: 1.3;
+        text-align: center;
+        padding-left: 3px;
+        padding-right: 2px;
+      }
+      .be-version.problem {
+        color: white;
+        font-weight: bold;
+        background-color: red;
+      }
+
+      .rows-count {
+        font-size: 9.5px;
+        color: #666;
+        flex: 0.7;
+        text-align: right;
+        padding-left: 3px;
+        padding-right: 2px;
+      }
+
+      .rows-count.problem {
+        color: white;
+        font-weight: bold;
+        background-color: red;
+      }
+
+      .status {
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 8px;
+        color: #fff;
+        white-space: nowrap;
+      }
+
+      .status.online {
+        background-color: #4caf50;
+      }
+
+      .status.offline {
+        background-color: #f44336;
+      }
+
+      .status.unknown {
+        background-color: #ff9800;
+      }
+
+      .server-info {
+        font-size: 10px;
+        color: #666;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sample server boxes with Last Version info -->
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">17.500</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status offline">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count problem">17.492</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version problem">2024-10-13 09:30:21</div>
+          <div class="rows-count">17.500</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status offline">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">17.500</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+      <div class="server-box">
+        <div class="server-header">
+          <div class="server-name">node001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+        <div class="server-header">
+          <div class="server-name">drc001</div>
+          <div class="status online">&nbsp;</div>
+          <div class="be-version">2024-10-14 15:12:33</div>
+          <div class="rows-count">25.000</div>
+        </div>
+      </div>
+
+      <!-- Repeat for a total of 100 servers -->
+      <!-- You can generate these dynamically in your backend if needed -->
+    </div>
+  </body>
+</html>

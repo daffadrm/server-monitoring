@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MBG Server Monitoring</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        padding: 20px;
+        /* height: 100vh; */
+      }
+
+      /* .container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      } */
+
+      #card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, auto));
+        /* grid-template-columns: repeat(8, 1fr); */
+
+        /* grid-template-rows: repeat(10, 1fr); */
+        gap: 2px;
+
+        /* display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        gap: 2px;
+        width: 98%;
+        height: 95%; */
+      }
+      .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 2px;
+        display: flex;
+        /* flex-direction: column;
+        justify-content: start; */
+        /* align-items: center; */
+      }
+
+      .server-details {
+        /* display: flex; */
+        /* flex-direction: column; */
+        /* gap: 8px; */
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-auto-rows: 1fr;
+      }
+
+      /* .server-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+      } */
+
+      .label {
+        font-weight: bold;
+      }
+
+      .value {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-align: left;
+      }
+
+      .card-header {
+        font-weight: bold;
+        font-size: 18px;
+        /* margin-bottom: 10px; */
+        text-align: center;
+      }
+
+      .server-info {
+        display: grid; /* Menampilkan tiap elemen sebagai grid */
+        grid-template-columns: auto 1fr; /* Kolom pertama untuk label, kolom kedua untuk value */
+        align-items: center; /* Menjaga teks sejajar secara vertikal */
+        /* margin-top: 10px; */
+      }
+
+      .loading {
+        font-size: 14px;
+        color: #888;
+        font-style: italic;
+        display: inline-block;
+        position: relative;
+      }
+
+      .loading::before {
+        content: "";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #888;
+        border-radius: 50%;
+        border-top-color: transparent; /* Membuat efek spinner */
+        animation: spin 1s linear infinite;
+        margin-right: 8px; /* Spasi antara spinner dan teks */
+      }
+
+      /* Animasi berputar */
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .status {
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+
+      .status.online {
+        color: #fff;
+        background-color: #4caf50;
+      }
+
+      .status.offline {
+        color: #fff;
+        background-color: #f44336;
+      }
+
+      .status.unknown {
+        color: #fff;
+        background-color: #ff9800;
+      }
+
+      .highlight {
+        color: #fff;
+        background-color: #f44336; /* Red background for smallest version or total */
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      .child-card {
+        display: grid;
+        grid-template-columns: 0.5fr 1fr 1fr 0.5fr; /*
+        /* justify-content: space-between; */
+        align-items: center;
+        /* border: 1px solid #ddd; */
+        /* margin-bottom: 10px; */
+        padding: 2px;
+        /* background-color: #fafafa; */
+        /* flex-wrap: wrap; Membuat child card fleksibel */
+      }
+
+      .child-card .server-info {
+        /* flex: 1 1 auto; */
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <button id="refresh">Refresh Data</button> -->
+    <div class="container" id="card-container">
+      <!-- Cards will be dynamically added here -->
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        const data = {
+          "mbg-dev-1": [
+            {
+              server_id: "mbg-dev-1",
+              type: "main",
+              server_url: "https://mbg-dev.cudo.co.id",
+            },
+            {
+              server_id: "mbg-dev-slave-1",
+              type: "drc",
+              server_url: "https://drc-mbg-dev.cudo.co.id",
+            },
+          ],
+          "mbg-dev-2": [
+            {
+              server_id: "mbg-dev-2",
+              type: "main",
+              server_url: "https://node2-mbg-dev.cudo.co.id",
+            },
+          ],
+          "mbg-dev-3": [
+            {
+              server_id: "mbg-dev-slave-2",
+              type: "drc",
+              server_url: "https://drc-mbg-dev.cudo.co.id",
+            },
+          ],
+          "mbg-dev-4": [
+            {
+              server_id: "mbg-dev-1",
+              type: "main",
+              server_url: "https://mbg-dev.cudo.co.id",
+            },
+            {
+              server_id: "mbg-dev-slave-1",
+              type: "drc",
+              server_url: "https://drc-mbg-dev.cudo.co.id",
+            },
+          ],
+        };
+
+        const previousData = {};
+        console.log(previousData, "previousData");
+
+        // Function to create a card
+        const createCards = (data) => {
+          const parentIds = Object.keys(data);
+          //   <div class="card-header">${parentId}</div>
+          parentIds.forEach((parentId) => {
+            const card = `
+            <div class="card" id="card-${parentId}">
+              <div class="card-header"></div>
+              <div class="server-details" id="server-details-${parentId}">
+                <div class="loading">Loading data...</div>
+              </div>
+            </div>
+          `;
+            $("#card-container").append(card);
+          });
+        };
+
+        const token =
+          "52F08EkutHVNvAPphDnKN5+xYeHQ8XIpvmwQDRQ+3ud/aosyZhvuuRGlrJVRXLjMnaPi4sFwgqDf4wzgs0PUIyUrH56u2CnEFetUK9C1QSMVRDZXn+OMXN0Jd2uHJRoc8Ld2dYZj1V7+KLDhfYZwkxj7VdDtqhVibkDANBofSmnbyAds0j02CXwbHNHo4BgKTdS8aDNudqhn0VCdJvpZ3/AB32JEHcnB/LFhK1FQ4oDy9auN3dwrR3V5Hr+4gILDoWv7tZmiRSzsr16Z51l+sitOrh/f6vyLfm7bSUT0VGyOv2uXc1+ISG+GRCoqCfpUNJ4pOMLrlRQ7UWQYyINxa8p1jYdvuSpHtla0o8lGuxUA/oF19/kF/Vxc4uNdGC6PvpK1GE/Bmx35KhHx6SZFF8lCCzxPfX8cYhAyGrA9yGP6Dse/bK+5D8I2CdyMdDwHgh4663GN77zTsl3nvChqS60q6huufrVRTnQcArCKU32NAr0jz8iL9HD/hDwASlUK1SpygMyAttXs7Ixq8E7o7FGkYNWL6267HvTxZPc+/i9Nr9m42rfnO0IXXtlpvvJsRS7PtexmHoOFYb3vSBVXjsd0V3sp0QIKY+ZyyNcoGuGqeYZLRXnc+2Kp7hUhOWhN98mZTaBOFJALR1nRqaxlgk82k98Hzw3WFZ1bd8aOqS30jX34ulEueC8Y1BOeYUp0CvVktrK3+Wc8NJpTPfya4YDcE1rlIEHD92PdfVdOQaYJLTqTHu1lJdN+Brt+tyQ9VfYPOEa9REFSbXoIUviHUux2VaDx76XCr0D9DQKx1K7pyYJB0kClFhIkKCUq3QUCowvDIATKCXnwmGFruV9bmUvn/sDC1I0DPQmjOosCAL/ZgJ4cjTyR+LSuL45He8RFe+yTa2ZXOwxq1K+1pmnhUnu17m88U5l4pYLxf8trScuIOiupsdeySwvcVjV9E7t5tMbfm+kwFZejAXLOw8gU1ONxYbux7fwQP4Hz7KcUeTkstNrEtcEYHEVcz6IFiWESAGgaK2aF79BBg/lqb5+yKqQw+X+HpOk9m3mEmkrmxzpSp8mk+uX7C2JfhvTvBca0mgQoNNc5mmDPcwtBA6c8TXLHadZ2/UHHL4HZYJmKLF2tMquKihJg/3cPoh5ywr3vwMMYRBLpzJTU6L3tR3V106OQEtk+coMGU";
+        console.log("Server Monitoring Application Loaded");
+
+        // Function to fetch server data
+        const fetchServerData = (server) => {
+          return new Promise((resolve) => {
+            $.ajax({
+              url: server.server_url + "/api/v1/node/status/",
+              method: "GET",
+              headers: {
+                Authorization: token, // Add the authorization token here
+              },
+              success: function (response) {
+                const statusClass =
+                  response.meta.code === 200 ? "online" : "offline";
+                resolve({
+                  server_id: server?.server_id,
+                  version: response?.data?.version || "-",
+                  status: statusClass || "unknown",
+                  total: response?.data?.total || "-",
+                  type: server.type || "-",
+                });
+              },
+              error: function () {
+                resolve({
+                  server_id: server?.server_id || "-",
+                  version: previousData[server.server_id]?.version || "-",
+                  status: "offline",
+                  total: previousData[server.server_id]?.total || "-",
+                  type: server.type || "-",
+                });
+              },
+            });
+          });
+        };
+
+        // Function to process a parent and its children
+        // const processParent = (parentId, children) => {
+        //   // Process each server (child) sequentially
+        //   return children.reduce((promise, server) => {
+        //     return promise.then(() =>
+        //       fetchServerData(server).then((serverDetails) => {
+        //         $(`#server-info-${parentId} .loading`).remove(); // Remove loading text
+        //         $(`#server-info-${parentId}`).append(serverDetails);
+        //       })
+        //     );
+        //   }, Promise.resolve());
+        // };
+
+        const processParent = async (parentId, children) => {
+          let results = [];
+          console.log("CHILDREN: ", children);
+
+          const lenthChildren = children?.length;
+
+          for (const child of children) {
+            const result = await fetchServerData(child);
+            results.push(result);
+            previousData[child.server_id] = result; // Save result to previousData
+          }
+
+          $(`#server-details-${parentId} .loading`).remove(); // Remove loading text
+
+          // Find the smallest version (ignoring "N/A")
+          const versions = results
+            .map((result) => result.version)
+            .filter((v) => v !== "-");
+          const minVersion = versions.length > 0 ? Math.min(...versions) : null;
+
+          const totals = results.map((result) => result.total);
+          const minTotal = totals.length > 0 ? Math.min(...totals) : null;
+
+          // Append server details to the card
+          $(`#server-details-${parentId}`).empty(); // Clear old content
+
+          if (results?.length <= 1) {
+            const refactorResults = results?.map((result) =>
+              result?.type === "main"
+                ? [{ ...result }, null]
+                : [null, { ...result }]
+            );
+
+            results = refactorResults.flat(1);
+          }
+
+          results.forEach((result) => {
+            let serverInfo;
+
+            if (!result) {
+              serverInfo = `<div class="child-card"></div>`;
+            } else {
+              const isMinVersion = result.version == minVersion;
+              const isMinTotal = result.total == minTotal;
+              const versionClass = isMinVersion ? "highlight" : "";
+              const totalClass = isMinTotal ? "highlight" : "";
+
+              serverInfo = `
+              <div class="child-card">
+                <div class="server-info">
+                  <span class="value status ${
+                    result.status === "online" ? "online" : "offline"
+                  }">${result.status}</span>
+                </div>
+                <div class="server-info">
+                  <span class="value">${result.server_id}</span>
+                </div>
+                <div class="server-info">
+                  <span class="value ${isMinVersion ? "highlight" : ""}">${
+                result.version
+              }</span>
+                </div>
+                <div class="server-info">
+                  <span class="value ${isMinTotal ? "highlight" : ""}">${
+                result.total
+              }</span>
+                </div>
+              </div>
+            `;
+            }
+            $(`#server-details-${parentId}`).append(serverInfo);
+          });
+        };
+
+        let shouldStop = false;
+
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        // Process all parents sequentially
+        // const processAllParents = (data) => {
+        //   const parentIds = Object.keys(data);
+
+        //   parentIds.reduce((promise, parentId) => {
+        //     return promise.then(() => processParent(parentId, data[parentId]));
+        //   }, Promise.resolve());
+        // };
+
+        const processAllParents = async (data) => {
+          while (!shouldStop) {
+            const parentIds = Object.keys(data);
+
+            // Process each parent sequentially
+            for (const parentId of parentIds) {
+              if (shouldStop) break;
+              await processParent(parentId, data[parentId]);
+            }
+
+            // Delay for 1 minute after all parents have been processed
+            if (!shouldStop) {
+              console.log("delay");
+              await sleep(60000); // Wait for 1 minute
+            }
+            console.log("end");
+          }
+        };
+
+        // Start processing
+        createCards(data);
+        processAllParents(data);
+
+        // const startProcessing = async () => {
+        //   await processAllParents(data);
+
+        //   setTimeout(startProcessing, 60000); // Wait 1 minute before starting again
+        // };
+        // startProcessing();
+        // setInterval(() => {
+        //   processAllParents(data);
+        // }, 1000);
+
+        $("#refresh").on("click", function () {
+          processAllParents(data); // Fetch data again
+        });
+      });
+    </script>
+  </body>
+</html>
