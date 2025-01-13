@@ -9,22 +9,16 @@
       body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f9;
-        padding: 20px;
+        /* padding: 20px; */
         /* height: 100vh; */
       }
 
-      /* .container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      } */
-
       #card-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, auto));
-        /* grid-template-columns: repeat(8, 1fr); */
+        /* grid-template-columns: repeat(auto-fill, minmax(300px, auto)); */
+        grid-template-columns: repeat(8, 1fr);
 
-        /* grid-template-rows: repeat(10, 1fr); */
+        grid-template-rows: repeat(10, 1fr);
         gap: 2px;
 
         /* display: grid;
@@ -40,18 +34,20 @@
         border-radius: 8px;
         padding: 2px;
         display: flex;
-        /* flex-direction: column;
-        justify-content: start; */
+        /* flex-direction: column; */
+        /* justify-content: start; */
         /* align-items: center; */
       }
 
       .server-details {
-        /* display: flex; */
-        /* flex-direction: column; */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
         /* gap: 8px; */
-        display: grid;
+        /* display: grid;
         grid-template-columns: 1fr;
-        grid-auto-rows: 1fr;
+        grid-auto-rows: 1fr; */
       }
 
       /* .server-info {
@@ -66,24 +62,16 @@
       }
 
       .value {
-        font-size: 12px;
+        font-size: 9.5px;
         padding: 4px 8px;
-        border-radius: 4px;
-        text-align: left;
-      }
-
-      .card-header {
-        font-weight: bold;
-        font-size: 18px;
-        /* margin-bottom: 10px; */
-        text-align: center;
       }
 
       .server-info {
-        display: grid; /* Menampilkan tiap elemen sebagai grid */
-        grid-template-columns: auto 1fr; /* Kolom pertama untuk label, kolom kedua untuk value */
-        align-items: center; /* Menjaga teks sejajar secara vertikal */
-        /* margin-top: 10px; */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+        gap: 4px;
       }
 
       .loading {
@@ -144,25 +132,44 @@
         border-radius: 4px;
       }
       .child-card {
-        display: grid;
-        grid-template-columns: 0.5fr 1fr 1fr 0.5fr; /*
-        /* justify-content: space-between; */
-        align-items: center;
-        /* border: 1px solid #ddd; */
-        /* margin-bottom: 10px; */
+        /* display: grid; */
+        /* grid-template-columns: 0.1fr 1.5fr 1.7fr 0.5fr; */
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        font-size: 10px;
         padding: 2px;
-        /* background-color: #fafafa; */
-        /* flex-wrap: wrap; Membuat child card fleksibel */
       }
 
       .child-card .server-info {
         /* flex: 1 1 auto; */
         text-align: left;
       }
+
+      .server-name {
+        font-weight: bold;
+        color: #333;
+        flex: 1;
+        text-align: left;
+      }
+
+      .be-version {
+        font-size: 9.5px;
+        flex: 1.3;
+        text-align: center;
+        padding-left: 3px;
+        padding-right: 2px;
+      }
+      .rows-count {
+        font-size: 9.5px;
+        flex: 0.7;
+        text-align: center;
+        padding-left: 3px;
+        padding-right: 2px;
+      }
     </style>
   </head>
   <body>
-    <!-- <button id="refresh">Refresh Data</button> -->
     <div class="container" id="card-container">
       <!-- Cards will be dynamically added here -->
     </div>
@@ -210,8 +217,9 @@
           ],
         };
 
+        // const data = JSON.parse("{{.data}}");
+
         const previousData = {};
-        console.log(previousData, "previousData");
 
         // Function to create a card
         const createCards = (data) => {
@@ -220,7 +228,6 @@
           parentIds.forEach((parentId) => {
             const card = `
             <div class="card" id="card-${parentId}">
-              <div class="card-header"></div>
               <div class="server-details" id="server-details-${parentId}">
                 <div class="loading">Loading data...</div>
               </div>
@@ -267,22 +274,8 @@
           });
         };
 
-        // Function to process a parent and its children
-        // const processParent = (parentId, children) => {
-        //   // Process each server (child) sequentially
-        //   return children.reduce((promise, server) => {
-        //     return promise.then(() =>
-        //       fetchServerData(server).then((serverDetails) => {
-        //         $(`#server-info-${parentId} .loading`).remove(); // Remove loading text
-        //         $(`#server-info-${parentId}`).append(serverDetails);
-        //       })
-        //     );
-        //   }, Promise.resolve());
-        // };
-
         const processParent = async (parentId, children) => {
           let results = [];
-          console.log("CHILDREN: ", children);
 
           const lenthChildren = children?.length;
 
@@ -298,10 +291,19 @@
           const versions = results
             .map((result) => result.version)
             .filter((v) => v !== "-");
-          const minVersion = versions.length > 0 ? Math.min(...versions) : null;
+          const parsedVersions = versions.map((v) => new Date(v).getTime());
+          const uniqueVersions = [...new Set(parsedVersions)];
 
-          const totals = results.map((result) => result.total);
-          const minTotal = totals.length > 0 ? Math.min(...totals) : null;
+          const minVersion =
+            uniqueVersions.length > 1 ? Math.min(...uniqueVersions) : null;
+
+          const totals = results
+            .map((result) => result.total)
+            .filter((t) => t !== "-");
+
+          const uniqueTotals = [...new Set(totals)];
+          const minTotal =
+            uniqueTotals.length > 1 ? Math.min(...uniqueTotals) : null;
 
           // Append server details to the card
           $(`#server-details-${parentId}`).empty(); // Clear old content
@@ -322,28 +324,24 @@
             if (!result) {
               serverInfo = `<div class="child-card"></div>`;
             } else {
-              const isMinVersion = result.version == minVersion;
-              const isMinTotal = result.total == minTotal;
+              const versionTime = new Date(result.version).getTime();
+              const isMinVersion =
+                minVersion !== null && versionTime == minVersion;
+              const isMinTotal = minTotal !== null && result.total == minTotal;
               const versionClass = isMinVersion ? "highlight" : "";
               const totalClass = isMinTotal ? "highlight" : "";
 
               serverInfo = `
               <div class="child-card">
                 <div class="server-info">
-                  <span class="value status ${
+                  <span class="status ${
                     result.status === "online" ? "online" : "offline"
-                  }">${result.status}</span>
-                </div>
-                <div class="server-info">
-                  <span class="value">${result.server_id}</span>
-                </div>
-                <div class="server-info">
-                  <span class="value ${isMinVersion ? "highlight" : ""}">${
+                  }">&nbsp;</span>
+                  <span class="server-name">${result.server_id}</span>
+                  <span class="be-version ${isMinVersion ? "highlight" : ""}">${
                 result.version
               }</span>
-                </div>
-                <div class="server-info">
-                  <span class="value ${isMinTotal ? "highlight" : ""}">${
+                  <span class="rows-count ${isMinTotal ? "highlight" : ""}">${
                 result.total
               }</span>
                 </div>
@@ -389,20 +387,6 @@
         // Start processing
         createCards(data);
         processAllParents(data);
-
-        // const startProcessing = async () => {
-        //   await processAllParents(data);
-
-        //   setTimeout(startProcessing, 60000); // Wait 1 minute before starting again
-        // };
-        // startProcessing();
-        // setInterval(() => {
-        //   processAllParents(data);
-        // }, 1000);
-
-        $("#refresh").on("click", function () {
-          processAllParents(data); // Fetch data again
-        });
       });
     </script>
   </body>
